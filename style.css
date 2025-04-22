@@ -4,6 +4,11 @@ body {
     padding: 0;
     background-color: #f0f4f8;
     color: #333;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
 }
 
 header {
@@ -11,11 +16,14 @@ header {
     color: white;
     padding: 20px;
     text-align: center;
+    width: 100%;
+    margin-bottom: 20px;
 }
 
 h1 {
-    margin: 0;
     font-size: 2.5rem;
+    margin: 0;
+    text-align: center;
 }
 
 form {
@@ -25,6 +33,7 @@ form {
     margin: 30px auto;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
 }
 
 label {
@@ -50,6 +59,7 @@ input[type="submit"] {
     font-size: 1rem;
     border-radius: 4px;
     cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
 input[type="submit"]:hover {
@@ -63,6 +73,20 @@ input[type="submit"]:hover {
     margin: 20px auto;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    animation: fadeIn 1s forwards;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.result img {
+    max-width: 150px;
+    border-radius: 8px;
+}
+
+.result .text {
+    text-align: left;
 }
 
 .result h2 {
@@ -80,16 +104,21 @@ input[type="submit"]:hover {
     color: #1DB954;
 }
 
-.footer {
+.loading {
+    display: none;
     text-align: center;
-    padding: 15px;
-    background-color: #1DB954;
-    color: white;
-    position: absolute;
-    width: 100%;
-    bottom: 0;
+    margin-top: 20px;
 }
 
-title {
-    text-align: center;
+.loading img {
+    width: 50px;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
 }
