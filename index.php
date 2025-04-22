@@ -1,98 +1,98 @@
 <?php
-// index.php
+// Fungsi untuk mendapatkan access token Spotify
+function getSpotifyAccessToken() {
+    $client_id = 'YOUR_SPOTIFY_CLIENT_ID'; // Ganti dengan Client ID Anda
+    $client_secret = 'YOUR_SPOTIFY_CLIENT_SECRET'; // Ganti dengan Client Secret Anda
 
-function fetchMusicbrainzData($query)
-{
-    $url = "https://musicbrainz.org/ws/2/recording?query=$query&fmt=json";
+    $url = "https://accounts.spotify.com/api/token";
+    $data = array(
+        'grant_type' => 'client_credentials'
+    );
 
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
+    $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'User-Agent: ISRCWebApp/1.0 (youremail@example.com)'
+        "Authorization: Basic " . base64_encode("$client_id:$client_secret")
     ]);
 
     $response = curl_exec($ch);
     curl_close($ch);
 
+    $response_data = json_decode($response, true);
+    return $response_data['access_token'];
+}
+
+// Fungsi untuk mencari lagu berdasarkan judul dan artis
+function searchSpotifyTrack($title, $artist) {
+    $access_token = getSpotifyAccessToken();
+    
+    $url = "https://api.spotify.com/v1/search?q=track:" . urlencode($title) . "+artist:" . urlencode($artist) . "&type=track&limit=1";
+    
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        "Authorization: Bearer $access_token"
+    ]);
+    
+    $response = curl_exec($ch);
+    curl_close($ch);
+    
     return json_decode($response, true);
 }
 
 $data = null;
-if (isset($_GET['mode'])) {
-    $mode = $_GET['mode'];
-    if ($mode === 'by_isrc' && isset($_GET['isrc'])) {
-        $isrc = htmlspecialchars($_GET['isrc']);
-        $query = "isrc:" . urlencode($isrc);
-        $data = fetchMusicbrainzData($query);
-    } elseif ($mode === 'by_song' && isset($_GET['title'], $_GET['artist'])) {
-        $title = htmlspecialchars($_GET['title']);
-        $artist = htmlspecialchars($_GET['artist']);
-        $query = "recording:\"$title\" AND artist:\"$artist\"";
-        $data = fetchMusicbrainzData(urlencode($query));
-    }
+if (isset($_GET['title']) && isset($_GET['artist'])) {
+    $title = htmlspecialchars($_GET['title']);
+    $artist = htmlspecialchars($_GET['artist']);
+    $data = searchSpotifyTrack($title, $artist);
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ISRC Lookup</title>
+    <title>ISRC Search - Spotify</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
         input[type="text"] { width: 300px; padding: 5px; }
         input[type="submit"] { padding: 5px 10px; }
-        .recording { border: 1px solid #ccc; margin-bottom: 20px; padding: 10px; }
-        pre { background-color: #f5f5f5; padding: 10px; }
-        .section { margin-bottom: 30px; }
+        .result { margin-top: 20px; }
+        .result p { font-size: 18px; }
     </style>
 </head>
 <body>
-    <h1>ISRC Lookup (MusicBrainz)</h1>
+    <h1>ISRC Search from Spotify</h1>
 
-    <div class="section">
-        <h2>Cari Berdasarkan ISRC</h2>
-        <form method="get">
-            <input type="hidden" name="mode" value="by_isrc">
-            <input type="text" name="isrc" placeholder="Masukkan ISRC" required>
-            <input type="submit" value="Cari">
-        </form>
-    </div>
+    <form method="get">
+        <label for="title">Song Title:</label>
+        <input type="text" name="title" placeholder="Enter song title" required>
+        <br><br>
+        <label for="artist">Artist Name:</label>
+        <input type="text" name="artist" placeholder="Enter artist name" required>
+        <br><br>
+        <input type="submit" value="Search">
+    </form>
 
-    <div class="section">
-        <h2>Cari ISRC dari Judul & Artis</h2>
-        <form method="get">
-            <input type="hidden" name="mode" value="by_song">
-            <input type="text" name="title" placeholder="Judul Lagu" required>
-            <input type="text" name="artist" placeholder="Nama Artis" required>
-            <input type="submit" value="Cari">
-        </form>
-    </div>
-
-    <?php if ($data) : ?>
-        <h2>Hasil:</h2>
-        <?php if (!empty($data['recordings'])) : ?>
-            <?php foreach ($data['recordings'] as $recording) : ?>
-                <div class="recording">
-                    <strong>Judul:</strong> <?= htmlspecialchars($recording['title']) ?><br>
-                    <strong>Artis:</strong>
-                    <?php foreach ($recording['artist-credit'] as $artist) {
-                        echo htmlspecialchars($artist['name']) . ' ';
-                    } ?><br>
-                    <?php if (!empty($recording['isrcs'])) : ?>
-                        <strong>ISRC:</strong> <?= implode(', ', $recording['isrcs']) ?><br>
-                    <?php endif; ?>
-                    <?php if (!empty($recording['length'])) : ?>
-                        <strong>Durasi:</strong> <?= round($recording['length'] / 1000) ?> detik<br>
-                    <?php endif; ?>
-                    <strong>ID:</strong> <?= htmlspecialchars($recording['id']) ?><br>
-                    <strong>Detail JSON:</strong>
-                    <pre><?= json_encode($recording, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) ?></pre>
-                </div>
-            <?php endforeach; ?>
-        <?php else : ?>
-            <p>Tidak ditemukan hasil.</p>
-        <?php endif; ?>
+    <?php if ($data): ?>
+        <div class="result">
+            <h2>Results:</h2>
+            <?php
+            if (isset($data['tracks']['items'][0])) {
+                $track = $data['tracks']['items'][0];
+                $isrc = $track['external_ids']['isrc'] ?? 'ISRC not found';
+                echo "<p><strong>Track:</strong> " . htmlspecialchars($track['name']) . "</p>";
+                echo "<p><strong>Artist:</strong> " . htmlspecialchars($track['artists'][0]['name']) . "</p>";
+                echo "<p><strong>ISRC:</strong> $isrc</p>";
+                echo "<p><strong>Duration:</strong> " . round($track['duration_ms'] / 1000) . " seconds</p>";
+            } else {
+                echo "<p>No results found.</p>";
+            }
+            ?>
+        </div>
     <?php endif; ?>
+
 </body>
 </html>
