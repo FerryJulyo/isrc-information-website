@@ -89,3 +89,7 @@ input[type="submit"]:hover {
     width: 100%;
     bottom: 0;
 }
+
+title {
+    text-align: center;
+}
