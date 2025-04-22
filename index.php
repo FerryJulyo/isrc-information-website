@@ -1,8 +1,8 @@
 <?php
 // Fungsi untuk mendapatkan access token Spotify
 function getSpotifyAccessToken() {
-    $client_id = 'YOUR_SPOTIFY_CLIENT_ID'; // Ganti dengan Client ID Anda
-    $client_secret = 'YOUR_SPOTIFY_CLIENT_SECRET'; // Ganti dengan Client Secret Anda
+    $client_id = '2a7adc3b5b184172bdda963735513637'; // Ganti dengan Client ID Anda
+    $client_secret = '0372bdcd32b64233a55e60ae8a6463b5'; // Ganti dengan Client Secret Anda
 
     $url = "https://accounts.spotify.com/api/token";
     $data = array(
