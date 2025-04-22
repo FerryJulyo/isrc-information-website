@@ -62,6 +62,7 @@ if (isset($_GET['title']) && isset($_GET['artist'])) {
         .result { margin-top: 20px; }
         .result p { font-size: 18px; }
     </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <h1>ISRC Search</h1>
