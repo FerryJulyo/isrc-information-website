@@ -54,7 +54,7 @@ if (isset($_GET['title']) && isset($_GET['artist'])) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ISRC Search - Spotify</title>
+    <title>ISRC Search</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
         input[type="text"] { width: 300px; padding: 5px; }
@@ -64,14 +64,14 @@ if (isset($_GET['title']) && isset($_GET['artist'])) {
     </style>
 </head>
 <body>
-    <h1>ISRC Search from Spotify</h1>
+    <h1>ISRC Search</h1>
 
     <form method="get">
         <label for="title">Song Title:</label>
-        <input type="text" name="title" placeholder="Enter song title" required>
+        <input type="text" name="title" placeholder="Enter song title" value="<?=isset($title) ? $title : '' ?>" required>
         <br><br>
         <label for="artist">Artist Name:</label>
-        <input type="text" name="artist" placeholder="Enter artist name" required>
+        <input type="text" name="artist" placeholder="Enter artist name" value="<?=isset($artist) ? $artist : '' ?>" required>
         <br><br>
         <input type="submit" value="Search">
     </form>
