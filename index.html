@@ -4,7 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <title>ISRC Search</title>
-    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -67,7 +66,7 @@
             return await response.json();
         }
 
-        document.getElementById('searchForm').addEventListener('submit', async function(e) {
+        document.getElementById('searchForm').addEventListener('submit', async function (e) {
             e.preventDefault();
             document.getElementById('loading').style.display = 'block';
             document.getElementById('result').style.display = 'none';
